@@ -1,3 +1,6 @@
+import java.net.URL;
+import java.net.HttpURLConnection;
+
 /**
  * Class representing a word and its definition to find.
  * @author Matthew Gray
@@ -8,6 +11,9 @@ public class Word
     private String word;
     /** The definition of the word */
     private String definition;
+    /** Service URL for requesting definition */
+    private static final String SERVICE_URL = 
+        "http://services.aonaware.com//DictService/DictService.asmx/Define?word=";
 
     /**
      * Instantiates a word with no definition (in order to get one).
@@ -15,6 +21,10 @@ public class Word
      */
     public Word(String word)
     {
+        if (word.contains(" ")) {
+            throw new IllegalArgumentException("Cannot contain spaces " +
+                    "or be more than one word.");
+        }
         this.word = word;
     }
 
@@ -25,7 +35,7 @@ public class Word
      */
     public Word(String word, String definition)
     {
-        this.word = word;
+        this(word);
         this.definition = definition;
     }
 
@@ -40,6 +50,7 @@ public class Word
         if (overwrite || (definition == null || definition.isEmpty())) {
             //get definition from online service
             //if not able to access internet, then do something
+            return "";
         } else {
             return this.definition;
         }
