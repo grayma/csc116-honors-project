@@ -1,0 +1,3 @@
+https://docs.oracle.com/javase/tutorial/uiswing/components/table.html - tables
+https://docs.oracle.com/javase/tutorial/uiswing/components/menu.html - java menus
+https://docs.oracle.com/javase/tutorial/uiswing/components/button.html - buttons checkboxes and the like
