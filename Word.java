@@ -14,6 +14,8 @@ public class Word
     private String word;
     /** The definition of the word */
     private String definition;
+    /** Other definitions of the word */
+    private String[] otherDefinitions;
     /** Service URL for requesting definition */
     private static final String SERVICE_URL = 
         "http://services.aonaware.com//DictService/DictService.asmx/Define?word=";
@@ -43,12 +45,12 @@ public class Word
     }
 
     /**
-     * Gets the definition of a word, sets it if necessary, and returns it.
+     * Gets the definitions of a word, sets the main one if necessary, and returns it.
      * @param overwrite if true, then function will attempt to retrieve from online
      * even if the definition is already set.
      * @return String containing the definition of the word.
      */
-    public String getDefinition(boolean overwrite)
+    public String getDefinitions(boolean overwrite)
     {
         if (overwrite || (definition == null || definition.isEmpty())) {
             //get definition from online service
@@ -69,23 +71,22 @@ public class Word
         } else {
             return this.definition;
         }
-        return "Wait this should never be reached? Why do I need a return here?";
     }
 
     /**
-     * Gets the definition of a word, sets it if necessary, and returns it.
+     * Gets the definitions of a word, sets the main one if necessary, and returns it.
      * @return String containint the definition of the word.
      */
-    public String getDefinition()
+    public String getDefinitions()
     {
-        return this.getDefinition(false);
+        return this.getDefinitions(false);
     }
 
     /**
      * Sets the definition, overriding whatever may be there.
      * @param definition what to set the object's definition to.
      */
-    public void setDefinition(String definition)
+    public void setMainDefinition(String definition)
     {
         this.definition = definition;
     }
@@ -105,7 +106,7 @@ public class Word
      */
     public String toString()
     {
-        return this.getWord() + this.getDefinition();
+        return this.getWord() + this.getDefinitions();
     }
 
     /**
@@ -121,7 +122,7 @@ public class Word
         if (o instanceof Word) {
             Word otherWord = (Word)o;
             if (this.getWord().equals(otherWord.getWord())) {
-                if (this.definition.equals(otherWord.getDefinition())) {
+                if (this.definition.equals(otherWord.getDefinitions())) {
                     return true;
                 }
             }
