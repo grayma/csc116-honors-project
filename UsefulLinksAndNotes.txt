@@ -3,3 +3,5 @@ https://docs.oracle.com/javase/tutorial/uiswing/components/menu.html - java menu
 https://docs.oracle.com/javase/tutorial/uiswing/components/button.html - buttons checkboxes and the like
 
 http://services.aonaware.com//DictService/DictService.asmx/Define?word= - word definition service
+
+https://weblogs.java.net/blog/pat/archive/2004/10/stupid_scanner_1.html - cleanly reading an input stream in one line
