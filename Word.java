@@ -2,8 +2,10 @@
 import java.net.URL;
 import java.net.HttpURLConnection;
 import java.net.UnknownHostException;
+import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.io.InputStream;
+import java.io.ByteArrayInputStream;
 import java.util.Scanner;
 //xml io
 import javax.xml.parsers.DocumentBuilder; //document builder
@@ -69,21 +71,29 @@ public class Word
                 InputStream response = new URL(SERVICE_URL + urlSafeWord).openStream();
                 Scanner responseReader = new Scanner(response).useDelimiter("\\A");
                 if (responseReader.hasNext()) {
-                    String responseString = responseReader.next();
-                    response.close();
                     //now to parse the XML
+                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder db = dbf.newDocumentBuilder();
+                    //gets a clean version of xml the document can parse
+                    String xml = responseReader.next();
+                    response.close();
+                    xml = xml.trim().replaceFirst("^([\\W]+)<","<");
+                    Document doc = db.parse(new ByteArrayInputStream(xml.getBytes("utf-8")));
+                    //now parse the xml in the document
+                    return "doc parsed"; 
                 } else {
                     return "ERROR!  Definition not found.";
                 }
-            } catch (UnknownHostException ex) {
+            } catch (UnknownHostException uEx) {
                 return "ERROR! Definition service unavailable (potentially no internet).";
+            } catch (MalformedURLException mEx) {
+                return "ERROR! Malformed URL.";  
             } catch (Exception ex) {
                 return "ERROR! " + ex.toString();
             }
         } else {
             return this.definition;
         }
-        return "Shouldn't be reached.  Temporary placeholder.";
     }
 
     /**
@@ -119,7 +129,7 @@ public class Word
      */
     public String toString()
     {
-        return this.getWord() + this.getDefinitions();
+        return this.getWord() + " - " + this.getDefinitions();
     }
 
     /**

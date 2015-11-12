@@ -7,7 +7,6 @@ public class WordTest
     public static void main(String[] args)
     {
         Word word = new Word("computer");
-        System.out.println(word.getDefinitions());
         System.out.println(word);
     }
 }
