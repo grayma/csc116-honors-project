@@ -5,3 +5,8 @@ https://docs.oracle.com/javase/tutorial/uiswing/components/button.html - buttons
 http://services.aonaware.com//DictService/DictService.asmx/Define?word= - word definition service
 
 https://weblogs.java.net/blog/pat/archive/2004/10/stupid_scanner_1.html - cleanly reading an input stream in one line
+
+https://docs.oracle.com/javase/7/docs/api/org/w3c/dom/Document.html - xml document
+https://docs.oracle.com/javase/7/docs/api/org/w3c/dom/Element.html - element for xml
+important classes:
+org.w3.dom; - includes xml document, elements, and nodes

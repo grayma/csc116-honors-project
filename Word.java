@@ -1,7 +1,14 @@
+//file and internet io
 import java.net.URL;
 import java.net.HttpURLConnection;
+import java.net.UnknownHostException;
+import java.net.URLEncoder;
 import java.io.InputStream;
 import java.util.Scanner;
+//xml io
+import javax.xml.parsers.DocumentBuilder; //document builder
+import javax.xml.parsers.DocumentBuilderFactory; //...factory
+import org.w3c.dom.*; //contains Document and Element etc
 
 /**
  * Class representing a word and 
@@ -26,10 +33,11 @@ public class Word
      */
     public Word(String word)
     {
+        /* added url encoding so this is unnecessary
         if (word.contains(" ")) {
             throw new IllegalArgumentException("Cannot contain spaces " +
                     "or be more than one word.");
-        }
+        }*/
         this.word = word;
     }
 
@@ -56,21 +64,26 @@ public class Word
             //get definition from online service
             //if not able to access internet, then do something
             try {
-                InputStream response = new URL(SERVICE_URL + this.word).openStream();
+                //download the xml definition page of the word
+                String urlSafeWord = URLEncoder.encode(this.word, "UTF-8");
+                InputStream response = new URL(SERVICE_URL + urlSafeWord).openStream();
                 Scanner responseReader = new Scanner(response).useDelimiter("\\A");
                 if (responseReader.hasNext()) {
                     String responseString = responseReader.next();
                     response.close();
-                    return responseString;
+                    //now to parse the XML
                 } else {
-                    return "Definition not found.";
+                    return "ERROR!  Definition not found.";
                 }
+            } catch (UnknownHostException ex) {
+                return "ERROR! Definition service unavailable (potentially no internet).";
             } catch (Exception ex) {
-                return ex.toString(); //if this becomes a problem, handle better
+                return "ERROR! " + ex.toString();
             }
         } else {
             return this.definition;
         }
+        return "Shouldn't be reached.  Temporary placeholder.";
     }
 
     /**
