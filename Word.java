@@ -109,6 +109,7 @@ public class Word
                         //now we've got all the data lets add it to the array
                         otherDefinitions[i] = new Definition(dictionaryName, definition, word);
                     }
+                    this.setMainDefinition(otherDefinitions[0].getDefinition());
                     return otherDefinitions[0].getDefinition();
                 } else {
                     return "ERROR!  Definition not found.";
