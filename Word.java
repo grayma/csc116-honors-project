@@ -24,10 +24,24 @@ public class Word
     /** The definition of the word */
     private String definition;
     /** Other definitions of the word */
-    private String[] otherDefinitions;
+    private Definition[] otherDefinitions;
     /** Service URL for requesting definition */
     private static final String SERVICE_URL = 
         "http://services.aonaware.com//DictService/DictService.asmx/Define?word=";
+
+    //xml indicies
+    //definition indicies
+    /** Location of the word itself */
+    private static final int XML_WORD_LOC = 1;
+    /** Location of the dictionary branch node */
+    private static final int XML_DICTIONARY_BRANCH_LOC = 3;
+    /** Location of the textual definition */
+    private static final int XML_DEFINITION_LOC = 5;
+    //dictionary indicies
+    /** Location of the dictionary ID */
+    private static final int XML_DICTIONARY_ID_LOC = 1;
+    /** Location of the dictionary title */
+    private static final int XML_DICTIONARY_NAME_LOC = 3;
 
     /**
      * Instantiates a word with no definition (in order to get one).
@@ -58,7 +72,7 @@ public class Word
      * Gets the definitions of a word, sets the main one if necessary, and returns it.
      * @param overwrite if true, then function will attempt to retrieve from online
      * even if the definition is already set.
-     * @return String containing the definition of the word.
+     * @return String containing the main definition of the word.
      */
     public String getDefinitions(boolean overwrite)
     {
@@ -79,8 +93,23 @@ public class Word
                     response.close();
                     xml = xml.trim().replaceFirst("^([\\W]+)<","<");
                     Document doc = db.parse(new ByteArrayInputStream(xml.getBytes("utf-8")));
-                    //now parse the xml in the document
-                    return "doc parsed"; 
+                    NodeList list = doc.getElementsByTagName("Definition");
+                    int numDefinitions = list.getLength(); 
+                    otherDefinitions = new Definition[numDefinitions];
+                    for (int i = 0; i < numDefinitions; i++)
+                    {
+                        Node node = list.item(i);
+                        NodeList children = node.getChildNodes(); //gets each child node of the definition
+                        //get all data
+                        String definition = children.item(XML_DEFINITION_LOC).getTextContent();
+                        String word = children.item(XML_WORD_LOC).getTextContent();
+                        NodeList dictionaryNode = children.item(XML_DICTIONARY_BRANCH_LOC).getChildNodes();
+                        String dictionaryId = dictionaryNode.item(XML_DICTIONARY_ID_LOC).getTextContent();
+                        String dictionaryName = dictionaryNode.item(XML_DICTIONARY_NAME_LOC).getTextContent();
+                        //now we've got all the data lets add it to the array
+                        otherDefinitions[i] = new Definition(dictionaryName, definition, word);
+                    }
+                    return otherDefinitions[0].getDefinition();
                 } else {
                     return "ERROR!  Definition not found.";
                 }
@@ -89,7 +118,8 @@ public class Word
             } catch (MalformedURLException mEx) {
                 return "ERROR! Malformed URL.";  
             } catch (Exception ex) {
-                return "ERROR! " + ex.toString();
+                ex.printStackTrace();
+                return "ERROR! " + ex;
             }
         } else {
             return this.definition;
@@ -103,6 +133,20 @@ public class Word
     public String getDefinitions()
     {
         return this.getDefinitions(false);
+    }
+
+    /**
+     * Gets all definitions possible for this term.
+     * @return Definition array containing all definitions.  Returns null if trouble getting definitions.
+     */
+    public Definition[] getAllDefinitions()
+    {
+        if (this.otherDefinitions != null) {
+            return this.otherDefinitions;
+        } else {
+            getDefinitions();
+            return this.otherDefinitions;
+        }
     }
 
     /**
@@ -153,3 +197,4 @@ public class Word
         return false;
     }
 }
+

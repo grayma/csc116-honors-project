@@ -7,6 +7,9 @@ xml/io docs:
 https://docs.oracle.com/javase/7/docs/api/org/w3c/dom/Document.html - xml document
 https://docs.oracle.com/javase/7/docs/api/org/w3c/dom/Element.html - element for xml
 http://services.aonaware.com//DictService/DictService.asmx/Define?word= - word definition service
+https://docs.oracle.com/javase/7/docs/api/org/w3c/dom/NodeList.html - xml node list
+https://docs.oracle.com/javase/7/docs/api/org/w3c/dom/Node.html - xml node
+
 
 credit where credit is due:
 -http://stackoverflow.com/questions/3030903/content-is-not-allowed-in-prolog-when-parsing-perfectly-valid-xml-on-gae - taking care of a byte that marked the start of a file yet made the SAX parser fail

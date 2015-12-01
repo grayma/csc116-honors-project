@@ -8,5 +8,10 @@ public class WordTest
     {
         Word word = new Word("computer");
         System.out.println(word);
+        Definition[] otherDefinitions = word.getAllDefinitions();
+        for (int i = 0; i < otherDefinitions.length; i++)
+        {
+            System.out.println(i + " - " + otherDefinitions[i]);
+        }
     }
 }
