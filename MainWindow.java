@@ -9,14 +9,20 @@ import java.awt.event.*;
  */
 public class MainWindow extends JFrame
 {
+    //component variables
     /** Variable to contain the word data table. */
-    JTable dataTable;
+    private JTable dataTable;
     /** Variable to contain the main file operation menu. */
-    JMenu fileMenu;
+    private JMenu fileMenu;
     /** Variable to contain the main word operation menu. */
-    JMenu wordMenu;
+    private JMenu wordMenu;
     /** Variable to contain the about menu. */
-    JMenu aboutMenu;
+    private JMenu aboutMenu;
+
+    /** Field to keep track of the currently opened file*/
+    private String filePath;
+    /** Field to keep track of whether the currently opened file is saved */
+    private boolean isModified;
 
     /**
      * Main constructor of this window.
@@ -24,6 +30,7 @@ public class MainWindow extends JFrame
     public MainWindow()
     {
         initUi();
+        newFile();
     }
 
     /**
@@ -142,7 +149,8 @@ public class MainWindow extends JFrame
 
     private void newFile()
     {
-
+        this.filePath = "";
+        this.isModified = false;
     }
 
 
@@ -155,6 +163,11 @@ public class MainWindow extends JFrame
     private void saveFile()
     {
 
+    }
+
+    private void print()
+    {
+        this.dataTable.print(); //WOW IT'S THIS EASY???!
     }
 
     //word operations
@@ -177,4 +190,18 @@ public class MainWindow extends JFrame
     }
 
     //component operations
+
+    //utility functions
+    /**
+     * Gets whether or not the file has been saved to a path at all.
+     * Valid assumption is that it isn't null, set to "" on instantiation.
+     * @return True if the file has been saved to a path at all, false otherwise.
+     */
+    private boolean isSavedAs()
+    {
+        if (this.filePath.equals("")) {
+            return false;
+        }
+        return true;
+    }
 }
