@@ -9,11 +9,26 @@ import java.awt.event.*;
  */
 public class MainWindow extends JFrame
 {
+    /** Variable to contain the word data table. */
+    JTable dataTable;
+    /** Variable to contain the main file operation menu. */
+    JMenu fileMenu;
+    /** Variable to contain the main word operation menu. */
+    JMenu wordMenu;
+    /** Variable to contain the about menu. */
+    JMenu aboutMenu;
+
+    /**
+     * Main constructor of this window.
+     */
     public MainWindow()
     {
         initUi();
     }
 
+    /**
+     * Initializes the GUI
+     */
     private void initUi()
     {
         setTitle("Definition Finder");
@@ -25,35 +40,51 @@ public class MainWindow extends JFrame
         //JMenuBar - help from https://docs.oracle.com/javase/tutorial/uiswing/components/menu.html//
         /////////////////////////////////////////////////////////////////////////////////////////////
 
-        //Where the GUI is created:
+        //Where the unimportant GUI is created:
         JMenuBar menuBar;
-        JMenu menu;
         JMenuItem menuItem;
 
         //Create the menu bar.
         menuBar = new JMenuBar();
 
-        //Build the first menu.
-        menu = new JMenu("Word Actions");
-        menu.setMnemonic(KeyEvent.VK_A);
-        menu.getAccessibleContext().setAccessibleDescription("The only menu in this program that has menu items");
-        menuBar.add(menu);
+        //Build the file menu.
+        fileMenu = new JMenu("File");
+        fileMenu.setMnemonic(KeyEvent.VK_A);
+        fileMenu.getAccessibleContext().setAccessibleDescription("The only menu in this program that has menu items");
+        menuBar.add(fileMenu);
+        //a group of JMenuItems for the file menu
+        menuItem = new JMenuItem("New", KeyEvent.VK_N);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+        fileMenu.add(menuItem);
+        menuItem = new JMenuItem("Save", KeyEvent.VK_S);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+        fileMenu.add(menuItem);
+        menuItem = new JMenuItem("Open", KeyEvent.VK_O);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+        fileMenu.add(menuItem);
+        menuItem = new JMenuItem("Print", KeyEvent.VK_P);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK));
 
-        //a group of JMenuItems
+        //Build the word menu.
+        wordMenu = new JMenu("Word");
+        wordMenu.setMnemonic(KeyEvent.VK_A);
+        wordMenu.getAccessibleContext().setAccessibleDescription("The only menu in this program that has menu items");
+        menuBar.add(wordMenu);
+        //a group of JMenuItems for the word menu
         menuItem = new JMenuItem("Add Word", KeyEvent.VK_A);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
-        menu.add(menuItem);
+        wordMenu.add(menuItem);
         menuItem = new JMenuItem("Remove Word", KeyEvent.VK_R);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.ALT_MASK));
-        menu.add(menuItem);
+        wordMenu.add(menuItem);
         menuItem = new JMenuItem("Get Definitions", KeyEvent.VK_G);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, ActionEvent.ALT_MASK));
-        menu.add(menuItem);
+        wordMenu.add(menuItem);
 
-        //Build second menu in the menu bar.
-        menu = new JMenu("About Application");
-        menu.setMnemonic(KeyEvent.VK_N);
-        menuBar.add(menu);
+        //Build about menu in the menu bar.
+        aboutMenu = new JMenu("About Application");
+        aboutMenu.setMnemonic(KeyEvent.VK_I);
+        menuBar.add(aboutMenu);
 
         this.setJMenuBar(menuBar);
 
@@ -61,18 +92,22 @@ public class MainWindow extends JFrame
         //table - help from https://docs.oracle.com/javase/tutorial/uiswing/components/table.html//
         ///////////////////////////////////////////////////////////////////////////////////////////
 
-        String[] columnNames = {"Word", "Defniition"};
+        String[] columnNames = {"Word", "Definition"};
 
         Object[][] data = {{"word1", "definition1"}, {"word2", "definition2"}, {"word3", "definition3"}};
 
-        JTable table = new JTable(data, columnNames);
+        dataTable = new JTable(data, columnNames);
+        //dataTable.setEnabled(false);
 
         this.setLayout(new BorderLayout());
-        this.add(table.getTableHeader(), BorderLayout.PAGE_START);
-        this.add(table, BorderLayout.CENTER);
-
+        this.add(dataTable.getTableHeader(), BorderLayout.PAGE_START);
+        this.add(dataTable, BorderLayout.CENTER);
     }
 
+    /**
+     * Overloaded from JFrame, manages creation of layout.
+     * @param arg JComponent argument to create layout with.
+     */
     private void createLayout(JComponent arg)
     {
         //gets the frames content pane and sets it to a grouplayout style
@@ -87,6 +122,10 @@ public class MainWindow extends JFrame
                 .addComponent(arg)); //manage vertical layout of components
     }
 
+    /**
+     * Entry-point to program.
+     * @param args Command line arguments.
+     */
     public static void main(String[] args)
     {
         //starts the window events
@@ -98,4 +137,44 @@ public class MainWindow extends JFrame
             }
         });
     }
+
+    //file operations
+
+    private void newFile()
+    {
+
+    }
+
+
+    private void openFile()
+    {
+        
+    }
+
+
+    private void saveFile()
+    {
+
+    }
+
+    //word operations
+
+    private void removeWord(int index)
+    {
+
+    }
+
+
+    private void addWord()
+    {
+
+    }
+
+
+    private void editDefinition(int index)
+    {
+
+    }
+
+    //component operations
 }
