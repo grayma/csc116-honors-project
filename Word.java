@@ -49,11 +49,6 @@ public class Word
      */
     public Word(String word)
     {
-        /* added url encoding so this is unnecessary
-        if (word.contains(" ")) {
-            throw new IllegalArgumentException("Cannot contain spaces " +
-                    "or be more than one word.");
-        }*/
         this.word = word;
     }
 
@@ -74,50 +69,34 @@ public class Word
      * even if the definition is already set.
      * @return String containing the main definition of the word.
      */
-    public String getDefinitions(boolean overwrite)
+    public String getDefinitions(ByteArrayInputStream inputStream, boolean overwrite)
     {
         if (overwrite || (definition == null || definition.isEmpty())) {
             //get definition from online service
             //if not able to access internet, then do something
             try {
-                //download the xml definition page of the word
-                String urlSafeWord = URLEncoder.encode(this.word, "UTF-8");
-                InputStream response = new URL(SERVICE_URL + urlSafeWord).openStream();
-                Scanner responseReader = new Scanner(response).useDelimiter("\\A");
-                if (responseReader.hasNext()) {
-                    //now to parse the XML
-                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                    DocumentBuilder db = dbf.newDocumentBuilder();
-                    //gets a clean version of xml the document can parse
-                    String xml = responseReader.next();
-                    response.close();
-                    xml = xml.trim().replaceFirst("^([\\W]+)<","<");
-                    Document doc = db.parse(new ByteArrayInputStream(xml.getBytes("utf-8")));
-                    NodeList list = doc.getElementsByTagName("Definition");
-                    int numDefinitions = list.getLength(); 
-                    otherDefinitions = new Definition[numDefinitions];
-                    for (int i = 0; i < numDefinitions; i++)
-                    {
-                        Node node = list.item(i);
-                        NodeList children = node.getChildNodes(); //gets each child node of the definition
-                        //get all data
-                        String definition = children.item(XML_DEFINITION_LOC).getTextContent();
-                        String word = children.item(XML_WORD_LOC).getTextContent();
-                        NodeList dictionaryNode = children.item(XML_DICTIONARY_BRANCH_LOC).getChildNodes();
-                        String dictionaryId = dictionaryNode.item(XML_DICTIONARY_ID_LOC).getTextContent();
-                        String dictionaryName = dictionaryNode.item(XML_DICTIONARY_NAME_LOC).getTextContent();
-                        //now we've got all the data lets add it to the array
-                        otherDefinitions[i] = new Definition(dictionaryName, definition, word);
-                    }
-                    this.setMainDefinition(otherDefinitions[0].getDefinition());
-                    return otherDefinitions[0].getDefinition();
-                } else {
-                    return "ERROR!  Definition not found.";
+                //now to parse the XML
+                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                DocumentBuilder db = dbf.newDocumentBuilder();
+                Document doc = db.parse(inputStream);
+                NodeList list = doc.getElementsByTagName("Definition");
+                int numDefinitions = list.getLength(); 
+                otherDefinitions = new Definition[numDefinitions];
+                for (int i = 0; i < numDefinitions; i++)
+                {
+                    Node node = list.item(i);
+                    NodeList children = node.getChildNodes(); //gets each child node of the definition
+                    //get all data
+                    String definition = children.item(XML_DEFINITION_LOC).getTextContent();
+                    String word = children.item(XML_WORD_LOC).getTextContent();
+                    NodeList dictionaryNode = children.item(XML_DICTIONARY_BRANCH_LOC).getChildNodes();
+                    String dictionaryId = dictionaryNode.item(XML_DICTIONARY_ID_LOC).getTextContent();
+                    String dictionaryName = dictionaryNode.item(XML_DICTIONARY_NAME_LOC).getTextContent();
+                    //now we've got all the data lets add it to the array
+                    otherDefinitions[i] = new Definition(dictionaryName, definition, word);
                 }
-            } catch (UnknownHostException uEx) {
-                return "ERROR! Definition service unavailable (potentially no internet).";
-            } catch (MalformedURLException mEx) {
-                return "ERROR! Malformed URL.";  
+                this.setMainDefinition(otherDefinitions[0].getDefinition());
+                return otherDefinitions[0].getDefinition();
             } catch (Exception ex) {
                 ex.printStackTrace();
                 return "ERROR! " + ex;
@@ -127,13 +106,36 @@ public class Word
         }
     }
 
+    public ByteArrayInputStream getStreamFromOnlineXML()
+    {
+        try {
+            //download the xml definition page of the word
+            String urlSafeWord = URLEncoder.encode(this.word, "UTF-8");
+            InputStream response = new URL(SERVICE_URL + urlSafeWord).openStream();
+            Scanner responseReader = new Scanner(response).useDelimiter("\\A");
+            if (responseReader.hasNext()) {
+                //gets a clean version of xml the document can parse
+                String xml = responseReader.next();
+                response.close();
+                xml = xml.trim().replaceFirst("^([\\W]+)<","<");
+                ByteArrayInputStream stream = new ByteArrayInputStream(xml.getBytes("utf-8"));
+                return stream;
+            } else {
+                return null;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
     /**
      * Gets the definitions of a word, sets the main one if necessary, and returns it.
      * @return String containint the definition of the word.
      */
     public String getDefinitions()
     {
-        return this.getDefinitions(false);
+        return this.getDefinitions(getStreamFromOnlineXML(), false);
     }
 
     /**
