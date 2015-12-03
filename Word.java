@@ -15,6 +15,7 @@ import org.w3c.dom.*; //contains Document and Element etc
 import javax.xml.transform.*; //this and 3 below are xml to string
 import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
+import javax.xml.xpath.*; //xpath for removing empty text nodes
 
 /**
  * Class representing a word and 
@@ -36,16 +37,16 @@ public class Word
     //xml indicies
     //definition indicies
     /** Location of the word itself */
-    private static final int XML_WORD_LOC = 1;
+    private static final int XML_WORD_LOC = 0;
     /** Location of the dictionary branch node */
-    private static final int XML_DICTIONARY_BRANCH_LOC = 3;
+    private static final int XML_DICTIONARY_BRANCH_LOC = 1;
     /** Location of the textual definition */
-    private static final int XML_DEFINITION_LOC = 5;
+    private static final int XML_DEFINITION_LOC = 2;
     //dictionary indicies
     /** Location of the dictionary ID */
-    private static final int XML_DICTIONARY_ID_LOC = 1;
+    private static final int XML_DICTIONARY_ID_LOC = 0;
     /** Location of the dictionary title */
-    private static final int XML_DICTIONARY_NAME_LOC = 3;
+    private static final int XML_DICTIONARY_NAME_LOC = 1;
 
     /**
      * Instantiates a word with no definition (in order to get one).
@@ -83,6 +84,7 @@ public class Word
                 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                 DocumentBuilder db = dbf.newDocumentBuilder();
                 Document doc = db.parse(inputStream);
+                removeEmptyTextNodes(doc);
                 NodeList list = doc.getElementsByTagName("Definition");
                 int numDefinitions = list.getLength(); 
                 otherDefinitions = new Definition[numDefinitions];
@@ -304,5 +306,31 @@ public class Word
            return null;
         }
     } 
+
+    /**
+     * Removes empty #text nodes from a document.
+     * From James Murty on this StackOverflow post:
+     * http://stackoverflow.com/questions/978810/how-to-strip-whitespace-only-text-nodes-from-a-dom-before-serialization
+     * @param doc The document to remove empty text nodes from.
+     */
+    private static void removeEmptyTextNodes(Document doc)
+    {
+        try {
+            XPathFactory xpathFactory = XPathFactory.newInstance();
+            // XPath to find empty text nodes.
+            XPathExpression xpathExp = xpathFactory.newXPath().compile(
+                    "//text()[normalize-space(.) = '']");  
+            NodeList emptyTextNodes = (NodeList) 
+                    xpathExp.evaluate(doc, XPathConstants.NODESET);
+
+            // Remove each empty text node from document.
+            for (int i = 0; i < emptyTextNodes.getLength(); i++) {
+                Node emptyTextNode = emptyTextNodes.item(i);
+                emptyTextNode.getParentNode().removeChild(emptyTextNode);
+            }
+        } catch (Exception ex) {
+           ex.printStackTrace();           
+        }
+    }
 }
 
