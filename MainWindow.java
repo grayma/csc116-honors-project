@@ -1,6 +1,8 @@
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 /**
  * MainWindow for definition finder.
@@ -19,10 +21,13 @@ public class MainWindow extends JFrame
     /** Variable to contain the about menu. */
     private JMenu aboutMenu;
 
+    //variables to manage the state of the application
     /** Field to keep track of the currently opened file*/
     private String filePath;
     /** Field to keep track of whether the currently opened file is saved */
     private boolean isModified;
+    /** Field to keep track of current Word[] */
+    private Word[] currentWords;
 
     /**
      * Main constructor of this window.
@@ -30,7 +35,10 @@ public class MainWindow extends JFrame
     public MainWindow()
     {
         initUi();
+        currentWords = new Word[0];
         newFile();
+        addWord();
+        addWord();
     }
 
     /**
@@ -100,10 +108,8 @@ public class MainWindow extends JFrame
         ///////////////////////////////////////////////////////////////////////////////////////////
 
         String[] columnNames = {"Word", "Definition"};
-
-        Object[][] data = {{"word1", "definition1"}, {"word2", "definition2"}, {"word3", "definition3"}};
-
-        dataTable = new JTable(data, columnNames);
+        DefaultTableModel model = new DefaultTableModel(null, columnNames);
+        dataTable = new JTable(model);
         //dataTable.setEnabled(false);
 
         this.setLayout(new BorderLayout());
@@ -146,11 +152,17 @@ public class MainWindow extends JFrame
     }
 
     //file operations
-
+    /**
+     * Starts a new file programmatically.
+     */
     private void newFile()
     {
         this.filePath = "";
         this.isModified = false;
+        for (int i = 0; i < currentWords.length; i++) {
+            dataTable.setValueAt("", i, 0);
+            dataTable.setValueAt("", i, 1);
+        }
     }
 
 
@@ -167,7 +179,12 @@ public class MainWindow extends JFrame
 
     private void print()
     {
-        this.dataTable.print(); //WOW IT'S THIS EASY???!
+        try {
+            this.dataTable.print(); //WOW IT'S THIS EASY???!
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return;
+        }
     }
 
     //word operations
@@ -177,12 +194,67 @@ public class MainWindow extends JFrame
 
     }
 
-
+    /**
+     * Adds a word to the JTable.
+     */
     private void addWord()
+    {
+        int n = JOptionPane.showConfirmDialog(
+            null,
+            "Would you like to input multiple terms (yes) or a single word (no)?",
+            "Question",
+            JOptionPane.YES_NO_OPTION);
+        Word[] words;
+        if (n == JOptionPane.YES_OPTION) {
+            ArrayList<Word> list = new ArrayList<Word>();
+            while (true) {
+                String word = (String)JOptionPane.showInputDialog(
+                        null,
+                        "Type in a term to add, leave the TextBox Blank if you are done adding terms.",
+                        "Enter Your Terms",
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        null,
+                        null);
+                if (word == null || word.equals("")) {
+                    words = new Word[list.size()];
+                    words = list.toArray(words);
+                    break;
+                }
+                list.add(new Word(word));
+            }
+        } else if (n == JOptionPane.NO_OPTION) {
+            String word = (String)JOptionPane.showInputDialog(
+                    null,
+                    "Type in a term to add, leave the TextBox Blank if you are done adding terms.",
+                    "Enter Your Terms",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    null,
+                    null);
+            words = new Word[] { new Word(word) };
+        } else {
+            return;
+        }
+        DefaultTableModel model = (DefaultTableModel)(dataTable.getModel());
+        for (int i = 0; i < words.length; i++) {
+            model.addRow(new Object[] { words[i].getWord(), "" });
+        }
+        Word[] newWords = new Word[currentWords.length + words.length];
+        int index;
+        for (index = 0; index < currentWords.length; index++) {
+            newWords[index] = currentWords[index];
+        }
+        for (int i = 0; i < words.length; i++) {
+            newWords[index + i] = words[i];
+        }
+        currentWords = newWords;
+    }
+
+    private static void getTextualInput(String question, String title)
     {
 
     }
-
 
     private void editDefinition(int index)
     {
