@@ -6,11 +6,15 @@ import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
+import java.io.StringWriter;
 import java.util.Scanner;
 //xml io
 import javax.xml.parsers.DocumentBuilder; //document builder
 import javax.xml.parsers.DocumentBuilderFactory; //...factory
 import org.w3c.dom.*; //contains Document and Element etc
+import javax.xml.transform.*; //this and 3 below are xml to string
+import javax.xml.transform.dom.*;
+import javax.xml.transform.stream.*;
 
 /**
  * Class representing a word and 
@@ -93,7 +97,10 @@ public class Word
                     String dictionaryId = dictionaryNode.item(XML_DICTIONARY_ID_LOC).getTextContent();
                     String dictionaryName = dictionaryNode.item(XML_DICTIONARY_NAME_LOC).getTextContent();
                     //now we've got all the data lets add it to the array
-                    otherDefinitions[i] = new Definition(dictionaryName, definition, word);
+                    otherDefinitions[i] = new Definition(dictionaryName, dictionaryId, definition, word);
+                }
+                if (otherDefinitions.length == 0) {
+                    otherDefinitions = new Definition[] {new Definition("nil", "nil", "NO DEFINITION FOUND", word)};
                 }
                 this.setMainDefinition(otherDefinitions[0].getDefinition());
                 return otherDefinitions[0].getDefinition();
@@ -106,6 +113,11 @@ public class Word
         }
     }
 
+    /**
+     * Gets a ByteArrayInputStream to parse a word from the definition API.
+     * @return ByteArrayInputStream containing definition XML, null if trouble
+     * parsing or getting the definition.
+     */
     public ByteArrayInputStream getStreamFromOnlineXML()
     {
         try {
@@ -149,6 +161,77 @@ public class Word
         } else {
             getDefinitions();
             return this.otherDefinitions;
+        }
+    }
+
+    /**
+     * Gets XML string for this definition so that it may be printed.
+     * @return XML node that can be saved of this word.
+     */
+    public Element getWordXMLNode(Document doc)
+    {
+        try {
+            Element rootWordElement = doc.createElement("WordDefinitions");
+            rootWordElement.setAttribute("word", this.word);
+            if (this.otherDefinitions == null) {
+                this.getDefinitions();
+            }
+            for (int i = 0; i < this.otherDefinitions.length; i++) {
+                //main definition node
+                Element definition = doc.createElement("Definition");
+
+                //word
+                Element word = doc.createElement("Word");
+                word.setTextContent(otherDefinitions[i].getWord());
+
+                //dictionary
+                Element dictionary = doc.createElement("Dictionary");
+                Element id = doc.createElement("Id");
+                id.setTextContent(otherDefinitions[i].getId());
+                Element source = doc.createElement("Name");
+                source.setTextContent(otherDefinitions[i].getSource());
+                dictionary.appendChild(id);
+                dictionary.appendChild(source);
+
+                //definition
+                Element wordDefinition = doc.createElement("WordDefinition");
+                wordDefinition.setTextContent(otherDefinitions[i].getDefinition());
+
+                //append all the children
+                definition.appendChild(word);
+                definition.appendChild(dictionary);
+                definition.appendChild(wordDefinition);
+                rootWordElement.appendChild(definition);
+
+            }
+            return rootWordElement;
+        } catch(Exception ex) {
+           ex.printStackTrace();
+           return null;
+        }
+    }
+
+    /**
+     * Gets the string of an XML document containing multiple words for saving purposes.
+     * @param words The words to save.
+     * @return String containing XML containing all words.
+     */
+    public static String getMultipleWordXML(Word[] words)
+    {
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.newDocument();
+            Element root = doc.createElement("Root");
+            for (int i = 0; i < words.length; i++) {
+                root.appendChild(words[i].getWordXMLNode(doc));
+            }
+            doc.appendChild(root);
+            return getStringFromDocument(doc);
+            
+        } catch(Exception ex) {
+           ex.printStackTrace();
+           return null;
         }
     }
 
@@ -199,5 +282,27 @@ public class Word
         }
         return false;
     }
+
+    /**
+     * Converts an XML document to a string.
+     * From Zaz Gmy on this StackOverflow post:
+     * http://stackoverflow.com/questions/10356258/how-do-i-convert-a-org-w3c-dom-document-object-to-a-string
+     * @param doc The document to convert to a String.
+     */
+    private static String getStringFromDocument(Document doc)
+    {
+        try {
+           DOMSource domSource = new DOMSource(doc);
+           StringWriter writer = new StringWriter();
+           StreamResult result = new StreamResult(writer);
+           TransformerFactory tf = TransformerFactory.newInstance();
+           Transformer transformer = tf.newTransformer();
+           transformer.transform(domSource, result);
+           return writer.toString();
+        } catch(TransformerException ex) {
+           ex.printStackTrace();
+           return null;
+        }
+    } 
 }
 

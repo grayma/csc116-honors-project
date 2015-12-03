@@ -2,6 +2,8 @@ public class Definition
 {
     /** Source of the definition */
     private String source;
+    /** ID of the source of the definition */
+    private String id;
     /** The actual definition */
     private String definition;
     /** The word for the definition */
@@ -12,9 +14,10 @@ public class Definition
      * @param source Where the definition is from.
      * @param definition The actual definition itself.
      */
-    public Definition(String source, String definition, String word)
+    public Definition(String source, String id, String definition, String word)
     {
         this.source = source;
+        this.id = id;
         this.definition = definition;
         this.word = word;
     }
@@ -26,6 +29,15 @@ public class Definition
     public String getSource()
     {
         return this.source;
+    }
+
+    /**
+     * Getter for the source ID.
+     * @return The ID of the source for this definition.
+     */
+    public String getId()
+    {
+        return this.id;
     }
 
     /**

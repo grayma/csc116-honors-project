@@ -22,3 +22,10 @@ useful functions:
 		print (I CAN’T BELIEVE OUT OF ALL THE THINGS JAVA MAKES CONVENIENT THAT THIS IS IT)
 		setValueAt(object value, row, column)
 		getValueAt(row, column)
+	xml:
+		documentBuilder:
+			newDocument
+		document
+			createElement(name)
+		element
+			setAttribute(name, value)
