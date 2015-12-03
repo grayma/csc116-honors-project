@@ -37,8 +37,6 @@ public class MainWindow extends JFrame
         initUi();
         currentWords = new Word[0];
         newFile();
-        addWord();
-        addWord();
     }
 
     /**
@@ -86,10 +84,29 @@ public class MainWindow extends JFrame
         wordMenu.getAccessibleContext().setAccessibleDescription("The only menu in this program that has menu items");
         menuBar.add(wordMenu);
         //a group of JMenuItems for the word menu
-        menuItem = new JMenuItem("Add Word", KeyEvent.VK_A);
+        menuItem = new JMenuItem(new AbstractAction("Add Word") {
+            public void actionPerformed(ActionEvent e) {
+                addWord();
+            }
+        });
+        menuItem.setMnemonic(KeyEvent.VK_A);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
         wordMenu.add(menuItem);
-        menuItem = new JMenuItem("Remove Word", KeyEvent.VK_R);
+        menuItem = new JMenuItem(new AbstractAction("Remove Word") {
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = dataTable.getSelectedRow();
+                if (selectedRow == -1) {
+                    JOptionPane.showMessageDialog(null,
+                        "To remove a row, one must select it.",
+                        "Error!",
+                        JOptionPane.ERROR_MESSAGE,
+                        null);
+                    return;
+                }
+                removeWord(selectedRow);
+            }
+        });
+        menuItem.setMnemonic(KeyEvent.VK_R);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.ALT_MASK));
         wordMenu.add(menuItem);
         menuItem = new JMenuItem("Get Definitions", KeyEvent.VK_G);
@@ -108,8 +125,14 @@ public class MainWindow extends JFrame
         ///////////////////////////////////////////////////////////////////////////////////////////
 
         String[] columnNames = {"Word", "Definition"};
-        DefaultTableModel model = new DefaultTableModel(null, columnNames);
+        DefaultTableModel model = new DefaultTableModel(null, columnNames) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+               return false;
+            }
+        };
         dataTable = new JTable(model);
+        dataTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         //dataTable.setEnabled(false);
 
         this.setLayout(new BorderLayout());
@@ -189,9 +212,22 @@ public class MainWindow extends JFrame
 
     //word operations
 
+    /**
+     * Removes a word at this index in the word[]/jtable.
+     * @param index the index to remove from.
+     */
     private void removeWord(int index)
     {
-
+        //index should never be bigger than the table's length
+        ((DefaultTableModel)dataTable.getModel()).removeRow(index);
+        Word[] newWords = new Word[currentWords.length - 1];
+        int newIndex = 0;
+        for (int i = 0; i < currentWords.length; i++) {
+            if (i != index) {
+                newWords[newIndex++] = currentWords[i];
+            }
+        }
+        currentWords = newWords;
     }
 
     /**
@@ -208,14 +244,8 @@ public class MainWindow extends JFrame
         if (n == JOptionPane.YES_OPTION) {
             ArrayList<Word> list = new ArrayList<Word>();
             while (true) {
-                String word = (String)JOptionPane.showInputDialog(
-                        null,
-                        "Type in a term to add, leave the TextBox Blank if you are done adding terms.",
-                        "Enter Your Terms",
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        null,
-                        null);
+                String word = getTextualInput("Type in a term to add, leave the TextBox Blank if you are done adding terms.",
+                    "Enter Your Terms"); 
                 if (word == null || word.equals("")) {
                     words = new Word[list.size()];
                     words = list.toArray(words);
@@ -224,14 +254,8 @@ public class MainWindow extends JFrame
                 list.add(new Word(word));
             }
         } else if (n == JOptionPane.NO_OPTION) {
-            String word = (String)JOptionPane.showInputDialog(
-                    null,
-                    "Type in a term to add, leave the TextBox Blank if you are done adding terms.",
-                    "Enter Your Terms",
-                    JOptionPane.QUESTION_MESSAGE,
-                    null,
-                    null,
-                    null);
+            String word = getTextualInput("Type in a term to add, leave the TextBox Blank if you are done adding terms.",
+                    "Enter Your Terms");
             words = new Word[] { new Word(word) };
         } else {
             return;
@@ -251,12 +275,30 @@ public class MainWindow extends JFrame
         currentWords = newWords;
     }
 
-    private static void getTextualInput(String question, String title)
+    /** 
+     * Utility function to prompt for a word.
+     * @param question The question to prompt with.
+     * @param title The title to prompt in the prompt window with.
+     * @return The word if entered, an empty or null String if nothing chosen.
+     */
+    private static String getTextualInput(String question, String title)
     {
-
+        String word = (String)JOptionPane.showInputDialog(
+                        null,
+                        question,
+                        title,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        null,
+                        null);
+        return word;
     }
 
-    private void editDefinition(int index)
+    /**
+     * Gets the definitions of all the words in the JTable.
+     * Prompts if the user wants first definition or their own choice in definition.
+     */
+    private void getDefinitions()
     {
 
     }
