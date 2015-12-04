@@ -66,7 +66,11 @@ public class MainWindow extends JFrame
         fileMenu.getAccessibleContext().setAccessibleDescription("The only menu in this program that has menu items");
         menuBar.add(fileMenu);
         //a group of JMenuItems for the file menu
-        menuItem = new JMenuItem("New", KeyEvent.VK_N);
+        menuItem = new JMenuItem(new AbstractAction("New") {
+            public void actionPerformed(ActionEvent e) {
+                newFile();
+            }
+        });
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
         fileMenu.add(menuItem);
         menuItem = new JMenuItem("Save", KeyEvent.VK_S);
@@ -75,8 +79,14 @@ public class MainWindow extends JFrame
         menuItem = new JMenuItem("Open", KeyEvent.VK_O);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
         fileMenu.add(menuItem);
-        menuItem = new JMenuItem("Print", KeyEvent.VK_P);
+        menuItem = new JMenuItem(new AbstractAction("Print") {
+            public void actionPerformed(ActionEvent e) {
+                print();            
+            }
+        });
+        menuItem.setMnemonic(KeyEvent.VK_P);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK));
+        fileMenu.add(menuItem);
 
         //Build the word menu.
         wordMenu = new JMenu("Word");
@@ -109,14 +119,14 @@ public class MainWindow extends JFrame
         menuItem.setMnemonic(KeyEvent.VK_R);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.ALT_MASK));
         wordMenu.add(menuItem);
-        menuItem = new JMenuItem("Get Definitions", KeyEvent.VK_G);
+        menuItem = new JMenuItem(new AbstractAction("Get Definitions") {
+            public void actionPerformed(ActionEvent e) {
+                getDefinitions();
+            }
+        });
+        menuItem.setMnemonic(KeyEvent.VK_G);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, ActionEvent.ALT_MASK));
         wordMenu.add(menuItem);
-
-        //Build about menu in the menu bar.
-        aboutMenu = new JMenu("About Application");
-        aboutMenu.setMnemonic(KeyEvent.VK_I);
-        menuBar.add(aboutMenu);
 
         this.setJMenuBar(menuBar);
 
@@ -182,9 +192,8 @@ public class MainWindow extends JFrame
     {
         this.filePath = "";
         this.isModified = false;
-        for (int i = 0; i < currentWords.length; i++) {
-            dataTable.setValueAt("", i, 0);
-            dataTable.setValueAt("", i, 1);
+        for (int i = currentWords.length - 1; i >= 0; i--) {
+            removeWord(i);
         }
     }
 
@@ -300,7 +309,25 @@ public class MainWindow extends JFrame
      */
     private void getDefinitions()
     {
-
+        int n = JOptionPane.showConfirmDialog(
+            null,
+            "Would you like to automatically select the first term (yes)" + 
+            " or have a choice out of all the terms (no)?",
+            "Question",
+            JOptionPane.YES_NO_OPTION);
+        Word[] words;
+        for (int i = 0; i < currentWords.length; i++) {
+            Definition chosenDefinition;
+            if (n == JOptionPane.YES_OPTION) {
+                chosenDefinition = currentWords[i].getAllDefinitions()[0];
+            } else if (n == JOptionPane.NO_OPTION) {
+                chosenDefinition = DefinitionChooserWindow.chooseDefinition(currentWords[i]);
+            } else {
+                return;
+            }
+            String definition = chosenDefinition.getDefinition();
+            dataTable.setValueAt(definition, i, 1);
+        }
     }
 
     //component operations
