@@ -44,7 +44,7 @@ public class DefinitionChooserWindow extends JFrame
     private void initUi()
     {
         setTitle("Definition Chooser");
-        setSize(400, 500);
+        setSize(400, 300);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
