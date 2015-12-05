@@ -74,12 +74,12 @@ public class DefinitionChooserWindow extends JPanel
      * Entry-point to program.
      * @param word Word to choose
      */
-    public static String chooseDefinition(Word paramWord)
+    public static DefinitionChooserWindow chooseDefinition(Word paramWord)
     {
         DefinitionChooserWindow window = new DefinitionChooserWindow(paramWord);
         JOptionPane.showMessageDialog(null,window,
             "Definition Chooser",JOptionPane.PLAIN_MESSAGE);
-        return window.getCurrentVisibleDefinition();
+        return window;
     }
 
     /**
@@ -117,5 +117,14 @@ public class DefinitionChooserWindow extends JPanel
     public String getCurrentVisibleDefinition()
     {
         return this.definitionTextArea.getText();
+    }
+
+    /**
+     * Gets the current visible definition's index.
+     * @return Current visible definition's index.
+     */
+    public int getCurrentDefinitionIndex()
+    {
+        return this.currentIndex;
     }
 }

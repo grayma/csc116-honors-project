@@ -220,7 +220,6 @@ public class MainWindow extends JFrame
     }
 
     //word operations
-
     /**
      * Removes a word at this index in the word[]/jtable.
      * @param index the index to remove from.
@@ -284,25 +283,6 @@ public class MainWindow extends JFrame
         currentWords = newWords;
     }
 
-    /** 
-     * Utility function to prompt for a word.
-     * @param question The question to prompt with.
-     * @param title The title to prompt in the prompt window with.
-     * @return The word if entered, an empty or null String if nothing chosen.
-     */
-    private static String getTextualInput(String question, String title)
-    {
-        String word = (String)JOptionPane.showInputDialog(
-                        null,
-                        question,
-                        title,
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        null,
-                        null);
-        return word;
-    }
-
     /**
      * Gets the definitions of all the words in the JTable.
      * Prompts if the user wants first definition or their own choice in definition.
@@ -321,15 +301,16 @@ public class MainWindow extends JFrame
             if (n == JOptionPane.YES_OPTION) {
                 chosenDefinition = currentWords[i].getAllDefinitions()[0].getDefinition();
             } else if (n == JOptionPane.NO_OPTION) {
-                chosenDefinition = DefinitionChooserWindow.chooseDefinition(currentWords[i]);
+                DefinitionChooserWindow window = DefinitionChooserWindow.chooseDefinition(currentWords[i]);
+                chosenDefinition = window.getCurrentVisibleDefinition();
+                currentWords[i].getAllDefinitions()[window.getCurrentDefinitionIndex()]
+                    .setDefinition(chosenDefinition);
             } else {
                 return;
             }
             dataTable.setValueAt(chosenDefinition, i, 1);
         }
     }
-
-    //component operations
 
     //utility functions
     /**
@@ -343,5 +324,24 @@ public class MainWindow extends JFrame
             return false;
         }
         return true;
+    }
+
+    /** 
+     * Utility function to prompt for a word.
+     * @param question The question to prompt with.
+     * @param title The title to prompt in the prompt window with.
+     * @return The word if entered, an empty or null String if nothing chosen.
+     */
+    private static String getTextualInput(String question, String title)
+    {
+        String word = (String)JOptionPane.showInputDialog(
+                        null,
+                        question,
+                        title,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        null,
+                        null);
+        return word;
     }
 }
