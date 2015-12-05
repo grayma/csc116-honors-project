@@ -32,12 +32,28 @@ public class Definition
     }
 
     /**
+     * Mutator for source
+     */
+    public void Source(String source)
+    {
+        this.source = source;
+    }
+
+    /**
      * Getter for the source ID.
      * @return The ID of the source for this definition.
      */
     public String getId()
     {
         return this.id;
+    }
+
+    /**
+     * Mutator for id
+     */
+    public void setId(String id)
+    {
+        this.id = id;
     }
 
     /**
@@ -50,12 +66,28 @@ public class Definition
     }
 
     /**
+     * Mutator for definition
+     */
+    public void setDefinition(String definition)
+    {
+        this.definition = definition;
+    }
+
+    /**
      * Getter for the word of the definition.
      * @return The word of this definition.
      */
     public String getWord()
     {
         return this.word;
+    }
+
+    /**
+     * Mutator for word
+     */
+    public void setWord(String word)
+    {
+        this.word = word;
     }
 
     /**
