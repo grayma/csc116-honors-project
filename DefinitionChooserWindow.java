@@ -11,31 +11,30 @@ import java.util.ArrayList;
  */
 public class DefinitionChooserWindow extends JFrame
 {
-    //component variables
-    /** Variable to contain the word data table. */
-    private JTable dataTable;
-    /** Variable to contain the main file operation menu. */
-    private JMenu fileMenu;
-    /** Variable to contain the main word operation menu. */
-    private JMenu wordMenu;
-    /** Variable to contain the about menu. */
-    private JMenu aboutMenu;
+    /** Word for this application */
+    private Word currentWord;
+    /** Definition currently being viewed */
+    private int currentIndex;
 
-    //variables to manage the state of the application
-    /** Field to keep track of the currently opened file*/
-    private String filePath;
-    /** Field to keep track of whether the currently opened file is saved */
-    private boolean isModified;
-    /** Field to keep track of current Word[] */
-    private Word[] currentWords;
+    /** Definition text area */
+    private JTextArea definitionTextArea;
+    /** Previous definition button */
+    private JButton previousButton;
+    /** Next definition button */
+    private JButton nextButton;
+    /** Choose definition button */
+    private JButton chooseButton;
+    /** Label for progress through definition */
+    private JLabel progressLabel;
 
     /**
      * Main constructor of this window.
      */
     public DefinitionChooserWindow(Word word)
     {
+        this.currentWord = word;
+        this.currentIndex = 0;
         initUi();
-        currentWords = new Word[0];
     }
 
     /**
@@ -44,11 +43,29 @@ public class DefinitionChooserWindow extends JFrame
     private void initUi()
     {
         setTitle("Definition Chooser");
-        setSize(400, 300);
+        setSize(670, 330);
         setLocationRelativeTo(null);
+        setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
+        //set layout and add progress label
         this.setLayout(new BorderLayout());
+        progressLabel = new JLabel("Viewing Definition 1/" 
+            + this.currentWord.getAllDefinitions().length,
+            SwingConstants.CENTER);
+        this.add(progressLabel, BorderLayout.NORTH);
+        //setup and add definition text area
+        definitionTextArea = new JTextArea(currentWord.getDefinitions());
+        this.add(definitionTextArea, BorderLayout.CENTER);
+        //setup and add previous, next, and choose definition buttons
+        JPanel bottomButtonPanel = new JPanel(new BorderLayout());
+        previousButton = new JButton("Previous Definition (CTRL-P)");
+        nextButton = new JButton("Next Definition (CTRL-N)");
+        chooseButton = new JButton("Choose Definition (CTRL-E)");
+        bottomButtonPanel.add(previousButton, BorderLayout.WEST);
+        bottomButtonPanel.add(nextButton, BorderLayout.EAST);
+        bottomButtonPanel.add(chooseButton, BorderLayout.CENTER);
+        this.add(bottomButtonPanel, BorderLayout.SOUTH);
         //this.add(dataTable, BorderLayout.CENTER);
     }
 
@@ -79,5 +96,29 @@ public class DefinitionChooserWindow extends JFrame
         DefinitionChooserWindow window = new DefinitionChooserWindow(paramWord);
         window.setVisible(true);
         return null;
+    }
+
+    /**
+     * Used when the reader wants to choose the current definition
+     */
+    private void choose()
+    {
+
+    }
+
+    /**
+     * Used when the reader wants to view the next definition
+     */
+    private void next()
+    {
+
+    }
+
+    /*
+     * Used when the reader wants to view the previous definition
+     */
+    private void previous()
+    {
+
     }
 }
