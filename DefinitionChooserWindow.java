@@ -9,7 +9,7 @@ import java.util.ArrayList;
  *
  * @author Matthew Gray (mrgray4@ncsu.edu)
  */
-public class DefinitionChooserWindow extends JFrame
+public class DefinitionChooserWindow extends JPanel
 {
     /** Word for this application */
     private Word currentWord;
@@ -22,8 +22,6 @@ public class DefinitionChooserWindow extends JFrame
     private JButton previousButton;
     /** Next definition button */
     private JButton nextButton;
-    /** Choose definition button */
-    private JButton chooseButton;
     /** Label for progress through definition */
     private JLabel progressLabel;
 
@@ -42,11 +40,7 @@ public class DefinitionChooserWindow extends JFrame
      */
     private void initUi()
     {
-        setTitle("Definition Chooser");
         setSize(670, 330);
-        setLocationRelativeTo(null);
-        setResizable(false);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         //set layout and add progress label
         this.setLayout(new BorderLayout());
@@ -56,54 +50,36 @@ public class DefinitionChooserWindow extends JFrame
         this.add(progressLabel, BorderLayout.NORTH);
         //setup and add definition text area
         definitionTextArea = new JTextArea(currentWord.getDefinitions());
-        this.add(definitionTextArea, BorderLayout.CENTER);
+        JScrollPane scroll = new JScrollPane(definitionTextArea);
+        this.add(scroll, BorderLayout.CENTER);
         //setup and add previous, next, and choose definition buttons
         JPanel bottomButtonPanel = new JPanel(new BorderLayout());
-        previousButton = new JButton("Previous Definition (CTRL-P)");
-        nextButton = new JButton("Next Definition (CTRL-N)");
-        chooseButton = new JButton("Choose Definition (CTRL-E)");
+        previousButton = new JButton(new AbstractAction("Previous") {
+            public void actionPerformed(ActionEvent e) {
+                previous();
+            }
+        });
+        nextButton = new JButton(new AbstractAction("Next") {
+            public void actionPerformed(ActionEvent e) {
+                next();
+            }
+        });
         bottomButtonPanel.add(previousButton, BorderLayout.WEST);
         bottomButtonPanel.add(nextButton, BorderLayout.EAST);
-        bottomButtonPanel.add(chooseButton, BorderLayout.CENTER);
         this.add(bottomButtonPanel, BorderLayout.SOUTH);
         //this.add(dataTable, BorderLayout.CENTER);
-    }
-
-    /**
-     * Overloaded from JFrame, manages creation of layout.
-     * @param arg JComponent argument to create layout with.
-     */
-    private void createLayout(JComponent arg)
-    {
-        //gets the frames content pane and sets it to a grouplayout style
-        Container pane = getContentPane();
-        GroupLayout groupLayout = new GroupLayout(pane);
-        pane.setLayout(groupLayout);
-
-        groupLayout.setAutoCreateContainerGaps(true); //automatically manage gaps between containers
-        groupLayout.setHorizontalGroup(groupLayout.createSequentialGroup()
-                .addComponent(arg)); //manage horizontal addition of components
-        groupLayout.setVerticalGroup(groupLayout.createSequentialGroup()
-                .addComponent(arg)); //manage vertical layout of components
     }
 
     /**
      * Entry-point to program.
      * @param word Word to choose
      */
-    public static Definition chooseDefinition(Word paramWord)
+    public static String chooseDefinition(Word paramWord)
     {
         DefinitionChooserWindow window = new DefinitionChooserWindow(paramWord);
-        window.setVisible(true);
-        return null;
-    }
-
-    /**
-     * Used when the reader wants to choose the current definition
-     */
-    private void choose()
-    {
-
+        JOptionPane.showMessageDialog(null,window,
+            "Definition Chooser",JOptionPane.PLAIN_MESSAGE);
+        return window.getCurrentVisibleDefinition();
     }
 
     /**
@@ -111,14 +87,35 @@ public class DefinitionChooserWindow extends JFrame
      */
     private void next()
     {
-
+        if (currentIndex == currentWord.getAllDefinitions().length - 1)
+            currentIndex = 0;
+        else
+            currentIndex++;
+        progressLabel.setText("Viewing Definition " + (currentIndex + 1) + "/" 
+            + this.currentWord.getAllDefinitions().length);
+        definitionTextArea.setText(this.currentWord.getAllDefinitions()[currentIndex].getDefinition());
     }
 
-    /*
+    /**
      * Used when the reader wants to view the previous definition
      */
     private void previous()
     {
+        if (currentIndex == 0)
+            currentIndex = this.currentWord.getAllDefinitions().length - 1;
+        else
+            currentIndex++;
+        progressLabel.setText("Viewing Definition " + (currentIndex + 1) + "/" 
+            + this.currentWord.getAllDefinitions().length);
+        definitionTextArea.setText(this.currentWord.getAllDefinitions()[currentIndex].getDefinition());
+    }
 
+    /**
+     * Gets the current defintion viewed by this window.
+     * @return The current definition.
+     */
+    public String getCurrentVisibleDefinition()
+    {
+        return this.definitionTextArea.getText();
     }
 }

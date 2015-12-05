@@ -317,16 +317,15 @@ public class MainWindow extends JFrame
             JOptionPane.YES_NO_OPTION);
         Word[] words;
         for (int i = 0; i < currentWords.length; i++) {
-            Definition chosenDefinition;
+            String chosenDefinition;
             if (n == JOptionPane.YES_OPTION) {
-                chosenDefinition = currentWords[i].getAllDefinitions()[0];
+                chosenDefinition = currentWords[i].getAllDefinitions()[0].getDefinition();
             } else if (n == JOptionPane.NO_OPTION) {
                 chosenDefinition = DefinitionChooserWindow.chooseDefinition(currentWords[i]);
             } else {
                 return;
             }
-            String definition = chosenDefinition.getDefinition();
-            dataTable.setValueAt(definition, i, 1);
+            dataTable.setValueAt(chosenDefinition, i, 1);
         }
     }
 
