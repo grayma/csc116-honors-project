@@ -2,6 +2,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.ArrayList;
 
 /**
@@ -73,10 +74,20 @@ public class MainWindow extends JFrame
         });
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
         fileMenu.add(menuItem);
-        menuItem = new JMenuItem("Save", KeyEvent.VK_S);
+        menuItem = new JMenuItem(new AbstractAction("Save") {
+            public void actionPerformed(ActionEvent e) {
+                saveFile();            
+            }
+        });
+        menuItem.setMnemonic(KeyEvent.VK_S);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
         fileMenu.add(menuItem);
-        menuItem = new JMenuItem("Open", KeyEvent.VK_O);
+        menuItem = new JMenuItem(new AbstractAction("Open") {
+            public void actionPerformed(ActionEvent e) {
+                openFile();            
+            }
+        });
+        menuItem.setMnemonic(KeyEvent.VK_P);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
         fileMenu.add(menuItem);
         menuItem = new JMenuItem(new AbstractAction("Print") {
@@ -206,7 +217,19 @@ public class MainWindow extends JFrame
 
     private void saveFile()
     {
-
+        try {
+            JFileChooser fileChooser = new JFileChooser();
+            int option = fileChooser.showSaveDialog(null);
+            if (option == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                FileOutputStream output = new FileOutputStream(file);
+                output.write(Word.getMultipleWordXML(currentWords).getBytes());
+                output.close();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return;
+        }
     }
 
     private void print()
@@ -305,6 +328,7 @@ public class MainWindow extends JFrame
                 chosenDefinition = window.getCurrentVisibleDefinition();
                 currentWords[i].getAllDefinitions()[window.getCurrentDefinitionIndex()]
                     .setDefinition(chosenDefinition);
+                currentWords[i].setMainDefinition(chosenDefinition);
             } else {
                 return;
             }

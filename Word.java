@@ -175,6 +175,7 @@ public class Word
         try {
             Element rootWordElement = doc.createElement("WordDefinitions");
             rootWordElement.setAttribute("word", this.word);
+            rootWordElement.setAttribute("mainDefinition", this.getMainDefinition());
             if (this.otherDefinitions == null) {
                 this.getDefinitions();
             }
@@ -244,6 +245,15 @@ public class Word
     public void setMainDefinition(String definition)
     {
         this.definition = definition;
+    }
+
+    /**
+     * Gets the main definition.
+     * @return The main definition.
+     */
+    public String getMainDefinition()
+    {
+        return this.definition;
     }
 
     /**
