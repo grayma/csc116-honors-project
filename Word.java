@@ -116,6 +116,58 @@ public class Word
     }
 
     /**
+     * Gets the definitions of a word, sets the main one if necessary, and returns it.
+     * @param overwrite if true, then function will attempt to retrieve from online
+     * even if the definition is already set.
+     * @return String containing the main definition of the word.
+     */
+    public static Word[] getWordsFromFile(ByteArrayInputStream inputStream)
+    {
+        try {
+            //now to parse the XML
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.parse(inputStream);
+            removeEmptyTextNodes(doc);
+            NodeList wordList = doc.getElementsByTagName("WordDefinitions");
+            int wordCount = wordList.getLength();
+            Word[] returnWords = new Word[wordCount];
+            for (int wordi = 0; wordi < wordCount; wordi++) 
+            {
+                NodeList list = ((Element)wordList.item(wordi)).getElementsByTagName("Definition");
+                Element wordElement = (Element)wordList.item(wordi);
+                String word = wordElement.getAttribute("word");
+                String mainDefinition = wordElement.getAttribute("mainDefinition");
+                int numDefinitions = list.getLength(); 
+                Definition[] wordOtherDefinitions = new Definition[numDefinitions];
+                for (int i = 0; i < numDefinitions; i++)
+                {
+                    Node node = list.item(i);
+                    NodeList children = node.getChildNodes(); //gets each child node of the definition
+                    //get all data
+                    String definition = children.item(XML_DEFINITION_LOC).getTextContent();
+                    String theWord = children.item(XML_WORD_LOC).getTextContent();
+                    NodeList dictionaryNode = children.item(XML_DICTIONARY_BRANCH_LOC).getChildNodes();
+                    String dictionaryId = dictionaryNode.item(XML_DICTIONARY_ID_LOC).getTextContent();
+                    String dictionaryName = dictionaryNode.item(XML_DICTIONARY_NAME_LOC).getTextContent();
+                    //now we've got all the data lets add it to the array
+                    wordOtherDefinitions[i] = new Definition(dictionaryName, dictionaryId, definition, theWord);
+                }
+                if (wordOtherDefinitions.length == 0) {
+                    wordOtherDefinitions = new Definition[] {new Definition("nil", "nil", "NO DEFINITION FOUND", word)};
+                }
+                Word currentWord = new Word(word, mainDefinition);
+                currentWord.setOtherDefinitions(wordOtherDefinitions);
+                returnWords[wordi] = currentWord;
+            }
+            return returnWords;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
      * Gets a ByteArrayInputStream to parse a word from the definition API.
      * @return ByteArrayInputStream containing definition XML, null if trouble
      * parsing or getting the definition.
@@ -245,6 +297,15 @@ public class Word
     public void setMainDefinition(String definition)
     {
         this.definition = definition;
+    }
+
+    /**
+     * Mutator for other definitions
+     * @param otherDefinitions What to set otherDefinitions to.
+     */
+    public void setOtherDefinitions(Definition[] otherDefinitions)
+    {
+        this.otherDefinitions = otherDefinitions;
     }
 
     /**

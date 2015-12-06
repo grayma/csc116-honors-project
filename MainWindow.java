@@ -153,12 +153,13 @@ public class MainWindow extends JFrame
             }
         };
         dataTable = new JTable(model);
+        JScrollPane tableScroll = new JScrollPane(dataTable);
         dataTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         //dataTable.setEnabled(false);
 
         this.setLayout(new BorderLayout());
         this.add(dataTable.getTableHeader(), BorderLayout.PAGE_START);
-        this.add(dataTable, BorderLayout.CENTER);
+        this.add(tableScroll, BorderLayout.CENTER);
     }
 
     /**
@@ -208,13 +209,34 @@ public class MainWindow extends JFrame
         }
     }
 
-
+    /**
+     * Opens a file into the GUI
+     */
     private void openFile()
     {
-        
+        try {
+            JFileChooser fileChooser = new JFileChooser();
+            int option = fileChooser.showOpenDialog(null);
+            if (option == JFileChooser.APPROVE_OPTION) {
+                newFile();
+                File file = fileChooser.getSelectedFile();
+                Word[] words = 
+                    Word.getWordsFromFile(new ByteArrayInputStream(readContentIntoByteArray(file)));
+                addWord(words);
+                this.currentWords = words;
+                for (int i = 0; i < words.length; i++) {
+                    dataTable.setValueAt(words[i].getMainDefinition(), i, 1);
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return;
+        }
     }
 
-
+    /**
+     * Saves the current words
+     */
     private void saveFile()
     {
         try {
@@ -232,6 +254,9 @@ public class MainWindow extends JFrame
         }
     }
 
+    /**
+     * Prints the current words
+     */
     private void print()
     {
         try {
@@ -259,6 +284,23 @@ public class MainWindow extends JFrame
             }
         }
         currentWords = newWords;
+    }
+
+    private void addWord(Word[] words)
+    {
+        DefaultTableModel model = (DefaultTableModel)(dataTable.getModel());
+        for (int i = 0; i < words.length; i++) {
+            model.addRow(new Object[] { words[i].getWord(), "" });
+        }
+        Word[] newWords = new Word[currentWords.length + words.length];
+        int index;
+        for (index = 0; index < currentWords.length; index++) {
+            newWords[index] = currentWords[index];
+        }
+        for (int i = 0; i < words.length; i++) {
+            newWords[index + i] = words[i];
+        }
+        this.currentWords = newWords;
     }
 
     /**
@@ -291,19 +333,7 @@ public class MainWindow extends JFrame
         } else {
             return;
         }
-        DefaultTableModel model = (DefaultTableModel)(dataTable.getModel());
-        for (int i = 0; i < words.length; i++) {
-            model.addRow(new Object[] { words[i].getWord(), "" });
-        }
-        Word[] newWords = new Word[currentWords.length + words.length];
-        int index;
-        for (index = 0; index < currentWords.length; index++) {
-            newWords[index] = currentWords[index];
-        }
-        for (int i = 0; i < words.length; i++) {
-            newWords[index + i] = words[i];
-        }
-        currentWords = newWords;
+        addWord(words);
     }
 
     /**
@@ -367,5 +397,27 @@ public class MainWindow extends JFrame
                         null,
                         null);
         return word;
+    }
+
+    /**
+     * Reads the contents of a File into a byte array.
+     * Credit to http://howtodoinjava.com/2014/11/04/how-to-read-file-content-into-byte-array-in-java/
+     * @param file The file to read from
+     * @return The byte array read in.
+     */
+    private static byte[] readContentIntoByteArray(File file)
+    {
+        FileInputStream fileInputStream = null;
+        byte[] bFile = new byte[(int) file.length()];
+        try
+        {
+            //convert file into array of bytes
+            fileInputStream = new FileInputStream(file);
+            fileInputStream.read(bFile);
+            fileInputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bFile;
     }
 }

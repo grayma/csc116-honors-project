@@ -15,6 +15,7 @@ credit where credit is due:
 -https://weblogs.java.net/blog/pat/archive/2004/10/stupid_scanner_1.html - cleanly reading an input stream in one line
 -http://stackoverflow.com/questions/978810/how-to-strip-whitespace-only-text-nodes-from-a-dom-before-serialization - removing whitespace/empty nodes from a DOM
 -http://stackoverflow.com/questions/10356258/how-do-i-convert-a-org-w3c-dom-document-object-to-a-string - converting a DOM to a string
+-http://howtodoinjava.com/2014/11/04/how-to-read-file-content-into-byte-array-in-java/ - reading a byte array in from a file
 
 useful functions:
 	table:
