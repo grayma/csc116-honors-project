@@ -138,6 +138,14 @@ public class MainWindow extends JFrame
         menuItem.setMnemonic(KeyEvent.VK_G);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, ActionEvent.ALT_MASK));
         wordMenu.add(menuItem);
+        menuItem = new JMenuItem(new AbstractAction("View Definitions") {
+            public void actionPerformed(ActionEvent e) {
+                viewDefinitions();
+            }
+        });
+        menuItem.setMnemonic(KeyEvent.VK_V);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.ALT_MASK));
+        wordMenu.add(menuItem);
 
         this.setJMenuBar(menuBar);
 
@@ -364,6 +372,14 @@ public class MainWindow extends JFrame
             }
             dataTable.setValueAt(chosenDefinition, i, 1);
         }
+    }
+
+    /**
+     * Views the definitions of all the words in the JTable.
+     */
+    private void viewDefinitions()
+    {
+        WordViewerWindow window = WordViewerWindow.showWords(this.currentWords);
     }
 
     //utility functions
