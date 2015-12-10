@@ -5,24 +5,24 @@ import java.awt.event.*;
 import java.util.ArrayList;
 
 /**
- * Window for choosing a definition.
+ * Window for studying words.
  *
  * @author Matthew Gray (mrgray4@ncsu.edu)
  */
 public class WordViewerWindow extends JPanel
 {
-    /** Word for this application */
+    /** Word for this window */
     private Word[] words;
     /** Definition currently being viewed */
     private int currentIndex;
 
     /** Definition text area */
     private JTextArea definitionTextArea;
-    /** Previous definition button */
+    /** Previous word button */
     private JButton previousButton;
-    /** Next definition button */
+    /** Next word button */
     private JButton nextButton;
-    /** Show definition button */
+    /** Show word button */
     private JButton showButton;
     /** Label for progress through definition */
     private JLabel progressLabel;
